@@ -32,18 +32,24 @@
 
         <!-- Worker Name -->
         <div class="field-group">
-          <label for="workerName">اسم العامل</label>
-          <div class="input-wrapper">
-            <input
-              type="text"
-              id="workerName"
-              name="worker_name"
-              placeholder="أدخل اسمك"
-              autocomplete="name"
-              required
-            >
-            <button type="button" class="clear-btn" id="clearWorker" aria-label="مسح الاسم" hidden>×</button>
-          </div>
+          <label for="workerSelect">اسم العامل</label>
+          <select id="workerSelect">
+            <option value="" disabled>اختر اسمك</option>
+            <option value="سعد">سعد</option>
+            <option value="جواد">جواد</option>
+            <option value="احمد">احمد</option>
+            <option value="عبد الله">عبد الله</option>
+            <option value="عماد">عماد</option>
+            <option value="محمد عيسى">محمد عيسى</option>
+            <option value="__other__">✏️ اسم آخر...</option>
+          </select>
+          <input
+            type="text"
+            id="workerNameCustom"
+            placeholder="أدخل اسمك"
+            autocomplete="name"
+            hidden
+          >
           <span class="field-error" id="workerNameError"></span>
         </div>
 

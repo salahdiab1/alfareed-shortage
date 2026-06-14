@@ -2,45 +2,56 @@
 
 const WORKER_KEY = 'alfareed_worker';
 
-const formCard        = document.getElementById('formCard');
-const successCard     = document.getElementById('successCard');
-const reportForm      = document.getElementById('reportForm');
-const workerNameInput = document.getElementById('workerName');
-const clearWorkerBtn  = document.getElementById('clearWorker');
-const productNameInput= document.getElementById('productName');
-const quantityInput   = document.getElementById('quantity');
-const priorityInput   = document.getElementById('priorityInput');
-const priorityBtns    = document.querySelectorAll('.priority-btn');
-const photoInput      = document.getElementById('photoInput');
-const photoPlaceholder= document.getElementById('photoPlaceholder');
-const photoPreview    = document.getElementById('photoPreview');
-const previewImg      = document.getElementById('previewImg');
-const removePhotoBtn  = document.getElementById('removePhoto');
-const submitBtn       = document.getElementById('submitBtn');
-const btnText         = submitBtn.querySelector('.btn-text');
-const btnSpinner      = submitBtn.querySelector('.btn-spinner');
-const anotherBtn      = document.getElementById('anotherBtn');
+const PRESET_NAMES = ['سعد','جواد','احمد','عبد الله','عماد','محمد عيسى'];
+
+const formCard         = document.getElementById('formCard');
+const successCard      = document.getElementById('successCard');
+const reportForm       = document.getElementById('reportForm');
+const workerSelect     = document.getElementById('workerSelect');
+const workerCustomInput= document.getElementById('workerNameCustom');
+const productNameInput = document.getElementById('productName');
+const quantityInput    = document.getElementById('quantity');
+const priorityInput    = document.getElementById('priorityInput');
+const priorityBtns     = document.querySelectorAll('.priority-btn');
+const photoInput       = document.getElementById('photoInput');
+const photoPlaceholder = document.getElementById('photoPlaceholder');
+const photoPreview     = document.getElementById('photoPreview');
+const previewImg       = document.getElementById('previewImg');
+const removePhotoBtn   = document.getElementById('removePhoto');
+const submitBtn        = document.getElementById('submitBtn');
+const btnText          = submitBtn.querySelector('.btn-text');
+const btnSpinner       = submitBtn.querySelector('.btn-spinner');
+const anotherBtn       = document.getElementById('anotherBtn');
 
 let compressedFile = null;
 
-// Auto-fill worker name from localStorage
-const savedName = localStorage.getItem(WORKER_KEY);
-if (savedName) {
-  workerNameInput.value = savedName;
-  clearWorkerBtn.hidden = false;
+function getWorkerName() {
+  if (workerSelect.value === '__other__') return workerCustomInput.value.trim();
+  return workerSelect.value;
 }
 
-// Worker name events
-workerNameInput.addEventListener('input', () => {
-  clearWorkerBtn.hidden = workerNameInput.value.length === 0;
-  clearFieldError('workerNameError', workerNameInput);
+// Restore from localStorage
+const savedName = localStorage.getItem(WORKER_KEY);
+if (savedName) {
+  if (PRESET_NAMES.includes(savedName)) {
+    workerSelect.value = savedName;
+  } else {
+    workerSelect.value = '__other__';
+    workerCustomInput.value = savedName;
+    workerCustomInput.hidden = false;
+  }
+}
+
+// Show/hide custom input when selecting "اسم آخر"
+workerSelect.addEventListener('change', () => {
+  const isOther = workerSelect.value === '__other__';
+  workerCustomInput.hidden = !isOther;
+  if (isOther) workerCustomInput.focus();
+  clearFieldError('workerNameError', workerSelect);
 });
 
-clearWorkerBtn.addEventListener('click', () => {
-  workerNameInput.value = '';
-  clearWorkerBtn.hidden = true;
-  localStorage.removeItem(WORKER_KEY);
-  workerNameInput.focus();
+workerCustomInput.addEventListener('input', () => {
+  clearFieldError('workerNameError', workerCustomInput);
 });
 
 // Priority toggle
@@ -91,10 +102,10 @@ submitBtn.addEventListener('click', async () => {
     return;
   }
 
-  localStorage.setItem(WORKER_KEY, workerNameInput.value.trim());
+  localStorage.setItem(WORKER_KEY, getWorkerName());
 
   const formData = new FormData();
-  formData.append('worker_name', workerNameInput.value.trim());
+  formData.append('worker_name', getWorkerName());
   formData.append('product',     productNameInput.value.trim());
   formData.append('quantity',    quantityInput.value);
   formData.append('priority',    priorityInput.value);
@@ -125,12 +136,13 @@ anotherBtn.addEventListener('click', resetForm);
 function validateForm() {
   let valid = true;
 
-  if (!workerNameInput.value.trim()) {
-    showFieldError('workerNameError', 'هذا الحقل مطلوب');
-    workerNameInput.classList.add('input-error');
+  if (!getWorkerName()) {
+    showFieldError('workerNameError', workerSelect.value === '__other__' ? 'أدخل اسمك' : 'اختر اسمك');
+    (workerSelect.value === '__other__' ? workerCustomInput : workerSelect).classList.add('input-error');
     valid = false;
   } else {
-    clearFieldError('workerNameError', workerNameInput);
+    clearFieldError('workerNameError', workerSelect);
+    workerCustomInput.classList.remove('input-error');
   }
 
   if (!productNameInput.value.trim()) {
@@ -197,7 +209,7 @@ function resetForm() {
     const el = document.getElementById(id);
     if (el) el.textContent = '';
   });
-  [workerNameInput, productNameInput, quantityInput].forEach(el => el.classList.remove('input-error'));
+  [workerSelect, workerCustomInput, productNameInput, quantityInput].forEach(el => el.classList.remove('input-error'));
 
   setLoading(false);
   successCard.hidden = true;
