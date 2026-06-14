@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B5E20">
+  <title>AL FAREED — لوحة التحكم</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <nav class="app-nav">
+    <a href="/"          class="nav-btn inactive">📝 تسجيل نقص</a>
+    <a href="/dashboard" class="nav-btn active">📊 الداشبورد</a>
+  </nav>
+
+  <!-- Sticky Header -->
+  <header class="dash-header">
+    <div class="header-brand">
+      <img src="/assets/farid.webp" alt="AL FAREED" class="header-logo-img">
+    </div>
+    <h1 class="page-title">لوحة التحكم — النواقص</h1>
+    <div class="live-clock" id="clock">--:--:--</div>
+  </header>
+
+  <main class="dash-main">
+
+    <!-- Stats -->
+    <section class="stats-grid">
+      <div class="stat-card stat-today">
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">إجمالي اليوم</div>
+        <div class="stat-sublabel">تقرير اليوم</div>
+      </div>
+      <div class="stat-card stat-urgent">
+        <div class="stat-number" id="statUrgent">0</div>
+        <div class="stat-label">عاجل مفتوح</div>
+        <div class="stat-sublabel">تحتاج تدخل</div>
+      </div>
+      <div class="stat-card stat-normal">
+        <div class="stat-number" id="statNormal">0</div>
+        <div class="stat-label">عادي مفتوح</div>
+        <div class="stat-sublabel">قيد المتابعة</div>
+      </div>
+      <div class="stat-card stat-resolved">
+        <div class="stat-number" id="statResolved">0</div>
+        <div class="stat-label">حُلّت اليوم</div>
+        <div class="stat-sublabel">تم إنجازها</div>
+      </div>
+    </section>
+
+    <!-- Filter Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-filter="all" role="tab" aria-selected="true">الكل</button>
+      <button class="tab" data-filter="urgent" role="tab" aria-selected="false">عاجل</button>
+      <button class="tab" data-filter="normal" role="tab" aria-selected="false">عادي</button>
+      <button class="tab" data-filter="resolved" role="tab" aria-selected="false">تم الحل</button>
+    </div>
+
+    <!-- Report List -->
+    <section class="report-list" id="reportList">
+      <div class="loading-state" id="loadingState">
+        <span class="spinner dash-spinner"></span>
+        <p>جارٍ التحميل...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="صورة المنتج">
+    <button class="lightbox-close" id="lightboxClose" aria-label="إغلاق">✕</button>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

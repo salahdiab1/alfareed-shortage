@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B5E20">
+  <title>AL FAREED — تسجيل النواقص</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/form.css">
+</head>
+<body>
+
+  <nav class="app-nav">
+    <a href="/"          class="nav-btn active">📝 تسجيل نقص</a>
+    <a href="/dashboard" class="nav-btn inactive">📊 الداشبورد</a>
+  </nav>
+
+  <main class="form-main">
+
+    <!-- Hero -->
+    <div class="form-hero">
+      <img src="/assets/farid.webp" alt="AL FAREED" class="hero-logo-img">
+      <p class="hero-tagline">سجّل النقص في ثوانٍ</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card" id="formCard">
+      <form id="reportForm" novalidate>
+
+        <!-- Worker Name -->
+        <div class="field-group">
+          <label for="workerName">اسم العامل</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="workerName"
+              name="worker_name"
+              placeholder="أدخل اسمك"
+              autocomplete="name"
+              required
+            >
+            <button type="button" class="clear-btn" id="clearWorker" aria-label="مسح الاسم" hidden>×</button>
+          </div>
+          <span class="field-error" id="workerNameError"></span>
+        </div>
+
+        <!-- Product Name -->
+        <div class="field-group">
+          <label for="productName">اسم المنتج الناقص</label>
+          <input
+            type="text"
+            id="productName"
+            name="product"
+            placeholder="اسم المنتج أو الكود"
+            autocomplete="off"
+            required
+          >
+          <span class="field-error" id="productNameError"></span>
+        </div>
+
+        <!-- Quantity -->
+        <div class="field-group">
+          <label for="quantity">الكمية الناقصة</label>
+          <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            placeholder="0"
+            min="1"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+          >
+          <span class="field-error" id="quantityError"></span>
+        </div>
+
+        <!-- Priority -->
+        <div class="field-group">
+          <label>الأولوية</label>
+          <div class="priority-toggle">
+            <button type="button" class="priority-btn" data-value="urgent" id="btnUrgent">🔴 عاجل</button>
+            <button type="button" class="priority-btn" data-value="normal" id="btnNormal">🟡 عادي</button>
+          </div>
+          <input type="hidden" id="priorityInput" name="priority">
+          <span class="field-error" id="priorityError"></span>
+        </div>
+
+        <!-- Photo -->
+        <div class="field-group">
+          <label>صورة (اختياري)</label>
+          <div class="photo-zone" id="photoZone">
+            <input
+              type="file"
+              id="photoInput"
+              accept="image/*"
+              capture="environment"
+              aria-label="رفع صورة"
+            >
+            <div class="photo-placeholder" id="photoPlaceholder">
+              <span class="photo-icon">📷</span>
+              <p>التقط صورة أو</p>
+              <p>اختر من المعرض</p>
+            </div>
+            <div class="photo-preview" id="photoPreview" hidden>
+              <img id="previewImg" src="" alt="معاينة الصورة">
+              <button type="button" class="remove-photo-btn" id="removePhoto" aria-label="حذف الصورة">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="button" class="submit-btn" id="submitBtn">
+          <span class="btn-text">تسجيل النقص ✅</span>
+          <span class="btn-spinner" hidden>
+            <span class="spinner"></span>
+            جارٍ الإرسال...
+          </span>
+        </button>
+        <span class="field-error submit-error" id="submitError"></span>
+
+      </form>
+    </div>
+
+    <!-- Success State -->
+    <div class="success-card" id="successCard" hidden>
+      <div class="success-icon-wrap">
+        <svg class="success-checkmark" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14 27 l8 8 l16-16"/>
+        </svg>
+      </div>
+      <h2 class="success-title">تم التسجيل بنجاح!</h2>
+      <p class="success-sub">تم إرسال بلاغ النقص<br>وسيتم المتابعة فوراً</p>
+      <button type="button" class="another-btn" id="anotherBtn">سجّل نقص آخر ➕</button>
+    </div>
+
+  </main>
+
+  <script src="/js/form.js"></script>
+</body>
+</html>
