@@ -171,6 +171,7 @@ function esc(str) {
 
 // --- Close ---
 async function closeReport(id, btn) {
+  if (!confirm('هل تريد إغلاق هذا البلاغ؟')) return;
   btn.disabled = true;
   try {
     const res = await fetch(`/api/reports/${id}/close`, { method: 'PATCH' });
