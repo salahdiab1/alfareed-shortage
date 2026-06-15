@@ -105,6 +105,20 @@ router.patch('/reports/:id/resolve', (req, res) => {
   }
 });
 
+// PATCH /api/reports/:id/inspect
+router.patch('/reports/:id/inspect', (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+    if (!report) return res.status(404).json({ error: 'البلاغ غير موجود' });
+    db.prepare("UPDATE reports SET inspected_at=CURRENT_TIMESTAMP WHERE id=?").run(id);
+    res.json({ message: 'تم الفحص' });
+  } catch (err) {
+    console.error(`PATCH /api/reports/:id/inspect error:`, err);
+    res.status(500).json({ error: 'حدث خطأ في الخادم' });
+  }
+});
+
 // PATCH /api/reports/:id/close
 router.patch('/reports/:id/close', (req, res) => {
   try {

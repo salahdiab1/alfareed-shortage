@@ -22,8 +22,9 @@ db.exec(`
   );
 `);
 
-// Migration: add closed_at column and support 'closed' status on existing DBs
+// Migrations
 try { db.exec("ALTER TABLE reports ADD COLUMN closed_at DATETIME"); } catch {}
+try { db.exec("ALTER TABLE reports ADD COLUMN inspected_at DATETIME"); } catch {}
 try {
   // Recreate table only if CHECK constraint doesn't allow 'closed'
   db.prepare("INSERT INTO reports(worker_name,product,quantity,priority,status) VALUES('_test','_test',1,'normal','closed')").run();

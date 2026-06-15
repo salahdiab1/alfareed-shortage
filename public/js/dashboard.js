@@ -101,6 +101,9 @@ function renderList() {
   reportList.querySelectorAll('.btn-close').forEach(btn => {
     btn.addEventListener('click', () => closeReport(btn.dataset.id, btn));
   });
+  reportList.querySelectorAll('.btn-inspect').forEach(btn => {
+    btn.addEventListener('click', () => inspectReport(btn.dataset.id, btn));
+  });
   reportList.querySelectorAll('.thumb').forEach(img => {
     img.addEventListener('click', () => openLightbox(img.src));
   });
@@ -125,7 +128,13 @@ function buildCard(r) {
     </div>` : '';
 
   const actionsHtml = resolved ? `
-    <div class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at)}</div>` :
+    <div class="card-done-row">
+      <span class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at)}</span>
+      ${r.inspected_at
+        ? `<span class="card-inspected-label">🔍 تم الفحص · ${timeAgo(r.inspected_at)}</span>`
+        : `<button class="btn-inspect" data-id="${r.id}">🔍 تم الفحص</button>`
+      }
+    </div>` :
     closed ? `
     <div class="card-resolved-label">⛔ تم الإغلاق · ${timeAgo(r.closed_at)}</div>` : `
     <div class="card-actions">
@@ -168,6 +177,22 @@ function esc(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+// --- Inspect ---
+async function inspectReport(id, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/reports/${id}/inspect`, { method: 'PATCH' });
+    if (!res.ok) throw new Error();
+    const report = currentReports.find(r => r.id == id);
+    if (report) report.inspected_at = new Date().toISOString();
+    renderList();
+    showToast('تم الفحص 🔍', 'success');
+  } catch {
+    btn.disabled = false;
+    showToast('فشل التحديث، حاول مجدداً', 'error');
+  }
 }
 
 // --- Close ---
