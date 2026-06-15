@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const db = require('../database');
 
 const UPLOADS_DIR = path.join(process.env.DATA_DIR || path.join(__dirname, '..'), 'uploads');
@@ -100,6 +101,25 @@ router.patch('/reports/:id/resolve', (req, res) => {
     res.json({ message: 'تم حل البلاغ بنجاح' });
   } catch (err) {
     console.error(`[${new Date().toISOString()}] PATCH /api/reports/:id/resolve error:`, err);
+    res.status(500).json({ error: 'حدث خطأ في الخادم' });
+  }
+});
+
+// DELETE /api/reports/:id
+router.delete('/reports/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+    if (!report) return res.status(404).json({ error: 'البلاغ غير موجود' });
+
+    if (report.photo_path) {
+      try { fs.unlinkSync(path.join(UPLOADS_DIR, path.basename(report.photo_path))); } catch {}
+    }
+
+    db.prepare('DELETE FROM reports WHERE id = ?').run(id);
+    res.json({ message: 'تم حذف البلاغ' });
+  } catch (err) {
+    console.error(`DELETE /api/reports/:id error:`, err);
     res.status(500).json({ error: 'حدث خطأ في الخادم' });
   }
 });

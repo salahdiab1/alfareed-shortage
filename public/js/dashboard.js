@@ -22,7 +22,7 @@ setInterval(updateClock, 1000);
 
 // --- Arabic relative time ---
 function timeAgo(dateString) {
-  const diff = (Date.now() - new Date(dateString)) / 1000;
+  const diff = (Date.now() - new Date(dateString + 'Z')) / 1000;
   if (diff < 60)    return 'الآن';
   if (diff < 3600)  return `منذ ${Math.floor(diff / 60)} دقيقة`;
   if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
@@ -95,6 +95,9 @@ function renderList() {
   reportList.querySelectorAll('.btn-resolve').forEach(btn => {
     btn.addEventListener('click', () => resolveReport(btn.dataset.id, btn));
   });
+  reportList.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', () => deleteReport(btn.dataset.id, btn));
+  });
   reportList.querySelectorAll('.thumb').forEach(img => {
     img.addEventListener('click', () => openLightbox(img.src));
   });
@@ -127,7 +130,10 @@ function buildCard(r) {
 
       <div class="card-header">
         <span class="badge ${badgeCls}">${badgeTxt}</span>
-        <span class="card-time">${timeAgo(r.created_at)}</span>
+        <div class="card-header-end">
+          <span class="card-time">${timeAgo(r.created_at)}</span>
+          <button class="btn-delete" data-id="${r.id}" aria-label="حذف البلاغ">🗑</button>
+        </div>
       </div>
 
       <h2 class="product-name">${esc(r.product)}</h2>
@@ -155,6 +161,30 @@ function esc(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+// --- Delete ---
+async function deleteReport(id, btn) {
+  if (!confirm('هل تريد حذف هذا البلاغ نهائياً؟')) return;
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error();
+    currentReports = currentReports.filter(r => r.id != id);
+    const card = reportList.querySelector(`.report-card[data-id="${id}"]`);
+    if (card) {
+      card.classList.add('card-fade-out');
+      card.addEventListener('animationend', () => {
+        card.remove();
+        fetchStats();
+        if (filtered().length === 0) renderList();
+      }, { once: true });
+    }
+    showToast('تم حذف البلاغ 🗑', 'success');
+  } catch {
+    btn.disabled = false;
+    showToast('فشل الحذف، حاول مجدداً', 'error');
+  }
 }
 
 // --- Resolve ---

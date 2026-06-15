@@ -209,11 +209,34 @@
   margin-bottom: 8px;
 }
 
+.card-header-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .card-time {
   font-size: 11px;
   color: var(--text-sub);
   font-weight: 600;
 }
+
+.btn-delete {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #FFF0F0;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+  transition: opacity 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.btn-delete:hover { opacity: 1; background: #FFCDD2; }
 
 .product-name {
   font-size: 22px;
