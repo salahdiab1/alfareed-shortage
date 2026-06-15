@@ -15,10 +15,12 @@ function getLocalIP() {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const DATA_DIR  = process.env.DATA_DIR || __dirname;
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 
-fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-require('./database');
+const db = require('./database');
 
 app.use(express.json());
 
@@ -30,7 +32,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', require('./routes/reports'));
@@ -39,9 +41,34 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+// --- 6-month rolling cleanup ---
+function cleanOldReports() {
+  try {
+    const old = db.prepare(
+      "SELECT photo_path FROM reports WHERE created_at < datetime('now', '-6 months') AND photo_path IS NOT NULL"
+    ).all();
+
+    for (const r of old) {
+      try { fs.unlinkSync(path.join(UPLOADS_DIR, path.basename(r.photo_path))); } catch {}
+    }
+
+    const { changes } = db.prepare(
+      "DELETE FROM reports WHERE created_at < datetime('now', '-6 months')"
+    ).run();
+
+    if (changes > 0) console.log(`🗑️  Cleanup: removed ${changes} reports older than 6 months`);
+  } catch (err) {
+    console.error('Cleanup error:', err);
+  }
+}
+
+cleanOldReports();
+setInterval(cleanOldReports, 24 * 60 * 60 * 1000);
+
 app.listen(PORT, () => {
   const ip = getLocalIP();
   console.log(`✅ AL FAREED Shortage System running`);
+  console.log(`   Data:     ${DATA_DIR}`);
   console.log(`   Local:    http://localhost:${PORT}`);
   console.log(`   Network:  http://${ip}:${PORT}   ← شاركه مع العمال`);
 });
