@@ -405,11 +405,17 @@
   box-shadow: 0 16px 48px rgba(0,0,0,0.50);
 }
 
-.lightbox-close {
+.lightbox-actions {
   position: absolute;
   top: 18px;
   left: 18px;
   z-index: 2;
+  display: flex;
+  gap: 10px;
+}
+
+.lightbox-close,
+.lightbox-download {
   width: 42px;
   height: 42px;
   background: rgba(255,255,255,0.15);
@@ -423,9 +429,11 @@
   justify-content: center;
   transition: background 0.18s;
   backdrop-filter: blur(4px);
+  text-decoration: none;
 }
 
 .lightbox-close:hover { background: var(--red); border-color: var(--red); }
+.lightbox-download:hover { background: var(--green-mid); border-color: var(--green-mid); }
 
 /* ── Responsive ── */
 @media (min-width: 480px) {

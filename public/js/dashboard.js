@@ -9,8 +9,9 @@ const statUrgent   = document.getElementById('statUrgent');
 const statNormal   = document.getElementById('statNormal');
 const statResolved = document.getElementById('statResolved');
 const tabs         = document.querySelectorAll('.tab');
-const lightbox     = document.getElementById('lightbox');
-const lightboxImg  = document.getElementById('lightboxImg');
+const lightbox          = document.getElementById('lightbox');
+const lightboxImg       = document.getElementById('lightboxImg');
+const lightboxDownload  = document.getElementById('lightboxDownload');
 
 // --- Clock ---
 function updateClock() {
@@ -239,6 +240,8 @@ tabs.forEach(tab => {
 // --- Lightbox ---
 function openLightbox(src) {
   lightboxImg.src = src;
+  lightboxDownload.href = src;
+  lightboxDownload.download = src.split('/').pop();
   lightbox.hidden = false;
 }
 
