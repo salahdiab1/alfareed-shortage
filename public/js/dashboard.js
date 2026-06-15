@@ -22,7 +22,9 @@ setInterval(updateClock, 1000);
 
 // --- Arabic relative time ---
 function timeAgo(dateString) {
-  const diff = (Date.now() - new Date(dateString + 'Z')) / 1000;
+  if (!dateString) return '';
+  const normalized = String(dateString).replace(' ', 'T').replace(/Z?$/, 'Z');
+  const diff = (Date.now() - new Date(normalized)) / 1000;
   if (diff < 60)    return 'الآن';
   if (diff < 3600)  return `منذ ${Math.floor(diff / 60)} دقيقة`;
   if (diff < 86400) return `منذ ${Math.floor(diff / 3600)} ساعة`;
@@ -122,10 +124,11 @@ function buildCard(r) {
     </div>` : '';
 
   const actionsHtml = resolved ? `
-    <div class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at + 'Z')}</div>` :
+    <div class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at)}</div>` :
     closed ? `
-    <div class="card-resolved-label">⛔ تم الإغلاق · ${timeAgo(r.closed_at + 'Z')}</div>` : `
+    <div class="card-resolved-label">⛔ تم الإغلاق · ${timeAgo(r.closed_at)}</div>` : `
     <div class="card-actions">
+      <button class="btn-close" data-id="${r.id}" aria-label="إغلاق البلاغ">✕ إغلاق</button>
       <button class="btn-resolve" data-id="${r.id}" aria-label="تحديد البلاغ كمحلول">تم الحل ✅</button>
     </div>`;
 
@@ -136,7 +139,6 @@ function buildCard(r) {
         <span class="badge ${badgeCls}">${badgeTxt}</span>
         <div class="card-header-end">
           <span class="card-time">${timeAgo(r.created_at)}</span>
-          ${!inactive ? `<button class="btn-close" data-id="${r.id}" aria-label="إغلاق البلاغ">✕</button>` : ''}
         </div>
       </div>
 
