@@ -221,22 +221,26 @@
   font-weight: 600;
 }
 
-.btn-delete {
+.btn-close {
   width: 28px;
   height: 28px;
   border: none;
-  background: #FFF0F0;
+  background: #F5F5F5;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9CA3AF;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.55;
-  transition: opacity 0.15s, background 0.15s;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
   flex-shrink: 0;
 }
-.btn-delete:hover { opacity: 1; background: #FFCDD2; }
+.btn-close:hover { opacity: 1; background: #FFF0F0; color: #D32F2F; }
+
+.badge-closed { background: #F3F4F6; color: #6B7280; }
 
 .product-name {
   font-size: 22px;

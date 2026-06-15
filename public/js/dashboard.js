@@ -95,8 +95,8 @@ function renderList() {
   reportList.querySelectorAll('.btn-resolve').forEach(btn => {
     btn.addEventListener('click', () => resolveReport(btn.dataset.id, btn));
   });
-  reportList.querySelectorAll('.btn-delete').forEach(btn => {
-    btn.addEventListener('click', () => deleteReport(btn.dataset.id, btn));
+  reportList.querySelectorAll('.btn-close').forEach(btn => {
+    btn.addEventListener('click', () => closeReport(btn.dataset.id, btn));
   });
   reportList.querySelectorAll('.thumb').forEach(img => {
     img.addEventListener('click', () => openLightbox(img.src));
@@ -107,12 +107,14 @@ function renderList() {
 function buildCard(r) {
   const urgent    = r.priority === 'urgent';
   const resolved  = r.status  === 'resolved';
+  const closed    = r.status  === 'closed';
+  const inactive  = resolved || closed;
 
   const priClass  = urgent ? 'priority-urgent' : 'priority-normal';
-  const stClass   = resolved ? 'status-resolved' : '';
+  const stClass   = inactive ? 'status-resolved' : '';
 
-  const badgeCls  = resolved ? 'badge-resolved' : (urgent ? 'badge-urgent' : 'badge-normal');
-  const badgeTxt  = resolved ? '✅ تم الحل'      : (urgent ? '⚡ عاجل'     : '🟡 عادي');
+  const badgeCls  = closed ? 'badge-closed' : (resolved ? 'badge-resolved' : (urgent ? 'badge-urgent' : 'badge-normal'));
+  const badgeTxt  = closed ? '⛔ تم الإغلاق' : (resolved ? '✅ تم الحل' : (urgent ? '⚡ عاجل' : '🟡 عادي'));
 
   const photoHtml = r.photo_path ? `
     <div class="card-photo">
@@ -120,7 +122,9 @@ function buildCard(r) {
     </div>` : '';
 
   const actionsHtml = resolved ? `
-    <div class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at)}</div>` : `
+    <div class="card-resolved-label">✅ تم الحل · ${timeAgo(r.resolved_at + 'Z')}</div>` :
+    closed ? `
+    <div class="card-resolved-label">⛔ تم الإغلاق · ${timeAgo(r.closed_at + 'Z')}</div>` : `
     <div class="card-actions">
       <button class="btn-resolve" data-id="${r.id}" aria-label="تحديد البلاغ كمحلول">تم الحل ✅</button>
     </div>`;
@@ -132,7 +136,7 @@ function buildCard(r) {
         <span class="badge ${badgeCls}">${badgeTxt}</span>
         <div class="card-header-end">
           <span class="card-time">${timeAgo(r.created_at)}</span>
-          <button class="btn-delete" data-id="${r.id}" aria-label="حذف البلاغ">🗑</button>
+          ${!inactive ? `<button class="btn-close" data-id="${r.id}" aria-label="إغلاق البلاغ">✕</button>` : ''}
         </div>
       </div>
 
@@ -163,27 +167,23 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 
-// --- Delete ---
-async function deleteReport(id, btn) {
-  if (!confirm('هل تريد حذف هذا البلاغ نهائياً؟')) return;
+// --- Close ---
+async function closeReport(id, btn) {
   btn.disabled = true;
   try {
-    const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/reports/${id}/close`, { method: 'PATCH' });
     if (!res.ok) throw new Error();
-    currentReports = currentReports.filter(r => r.id != id);
-    const card = reportList.querySelector(`.report-card[data-id="${id}"]`);
-    if (card) {
-      card.classList.add('card-fade-out');
-      card.addEventListener('animationend', () => {
-        card.remove();
-        fetchStats();
-        if (filtered().length === 0) renderList();
-      }, { once: true });
+    const report = currentReports.find(r => r.id == id);
+    if (report) {
+      report.status   = 'closed';
+      report.closed_at = new Date().toISOString().replace('Z','');
     }
-    showToast('تم حذف البلاغ 🗑', 'success');
+    renderList();
+    fetchStats();
+    showToast('تم إغلاق البلاغ ⛔', 'success');
   } catch {
     btn.disabled = false;
-    showToast('فشل الحذف، حاول مجدداً', 'error');
+    showToast('فشل الإغلاق، حاول مجدداً', 'error');
   }
 }
 

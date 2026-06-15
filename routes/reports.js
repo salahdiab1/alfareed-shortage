@@ -105,21 +105,18 @@ router.patch('/reports/:id/resolve', (req, res) => {
   }
 });
 
-// DELETE /api/reports/:id
-router.delete('/reports/:id', (req, res) => {
+// PATCH /api/reports/:id/close
+router.patch('/reports/:id/close', (req, res) => {
   try {
     const { id } = req.params;
     const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
     if (!report) return res.status(404).json({ error: 'البلاغ غير موجود' });
+    if (report.status === 'closed') return res.status(400).json({ error: 'البلاغ مغلق بالفعل' });
 
-    if (report.photo_path) {
-      try { fs.unlinkSync(path.join(UPLOADS_DIR, path.basename(report.photo_path))); } catch {}
-    }
-
-    db.prepare('DELETE FROM reports WHERE id = ?').run(id);
-    res.json({ message: 'تم حذف البلاغ' });
+    db.prepare("UPDATE reports SET status='closed', closed_at=CURRENT_TIMESTAMP WHERE id=?").run(id);
+    res.json({ message: 'تم إغلاق البلاغ' });
   } catch (err) {
-    console.error(`DELETE /api/reports/:id error:`, err);
+    console.error(`PATCH /api/reports/:id/close error:`, err);
     res.status(500).json({ error: 'حدث خطأ في الخادم' });
   }
 });

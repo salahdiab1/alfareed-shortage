@@ -15,10 +15,33 @@ db.exec(`
     quantity    INTEGER NOT NULL CHECK(quantity > 0),
     priority    TEXT    NOT NULL CHECK(priority IN ('urgent', 'normal')),
     photo_path  TEXT,
-    status      TEXT    NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'resolved')),
+    status      TEXT    NOT NULL DEFAULT 'open' CHECK(status IN ('open', 'resolved', 'closed')),
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    resolved_at DATETIME
+    resolved_at DATETIME,
+    closed_at   DATETIME
   );
 `);
+
+// Migration: add closed_at column and support 'closed' status on existing DBs
+try { db.exec("ALTER TABLE reports ADD COLUMN closed_at DATETIME"); } catch {}
+try {
+  // Recreate table only if CHECK constraint doesn't allow 'closed'
+  db.prepare("INSERT INTO reports(worker_name,product,quantity,priority,status) VALUES('_test','_test',1,'normal','closed')").run();
+  db.prepare("DELETE FROM reports WHERE worker_name='_test'").run();
+} catch {
+  db.exec(`
+    BEGIN;
+    CREATE TABLE IF NOT EXISTS reports_v2 (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, worker_name TEXT NOT NULL, product TEXT NOT NULL,
+      quantity INTEGER NOT NULL CHECK(quantity>0), priority TEXT NOT NULL CHECK(priority IN ('urgent','normal')),
+      photo_path TEXT, status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved','closed')),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP, resolved_at DATETIME, closed_at DATETIME
+    );
+    INSERT INTO reports_v2 SELECT id,worker_name,product,quantity,priority,photo_path,status,created_at,resolved_at,NULL FROM reports;
+    DROP TABLE reports;
+    ALTER TABLE reports_v2 RENAME TO reports;
+    COMMIT;
+  `);
+}
 
 module.exports = db;
