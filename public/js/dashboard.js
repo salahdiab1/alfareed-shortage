@@ -4,10 +4,12 @@ let currentReports = [];
 let currentFilter  = 'all';
 
 const reportList   = document.getElementById('reportList');
-const statTotal    = document.getElementById('statTotal');
-const statUrgent   = document.getElementById('statUrgent');
-const statNormal   = document.getElementById('statNormal');
-const statResolved = document.getElementById('statResolved');
+const statTotal     = document.getElementById('statTotal');
+const statUrgent    = document.getElementById('statUrgent');
+const statNormal    = document.getElementById('statNormal');
+const statResolved  = document.getElementById('statResolved');
+const statInspected = document.getElementById('statInspected');
+const statClosed    = document.getElementById('statClosed');
 const tabs         = document.querySelectorAll('.tab');
 const lightbox          = document.getElementById('lightbox');
 const lightboxImg       = document.getElementById('lightboxImg');
@@ -52,10 +54,12 @@ async function fetchStats() {
     const res = await fetch('/api/stats');
     if (!res.ok) return;
     const d = await res.json();
-    animateCount(statTotal,    d.today_total);
-    animateCount(statUrgent,   d.urgent_open);
-    animateCount(statNormal,   d.normal_open);
-    animateCount(statResolved, d.resolved_today);
+    animateCount(statTotal,     d.today_total);
+    animateCount(statUrgent,    d.urgent_open);
+    animateCount(statNormal,    d.normal_open);
+    animateCount(statResolved,  d.resolved_today);
+    animateCount(statInspected, d.inspected_total);
+    animateCount(statClosed,    d.closed_total);
   } catch (err) {
     console.error('Stats fetch failed:', err);
   }

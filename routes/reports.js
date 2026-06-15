@@ -138,23 +138,15 @@ router.patch('/reports/:id/close', (req, res) => {
 // GET /api/stats
 router.get('/stats', (req, res) => {
   try {
-    const today_total = db.prepare(`
-      SELECT COUNT(*) as c FROM reports WHERE DATE(created_at) = DATE('now')
-    `).get().c;
-
-    const urgent_open = db.prepare(`
-      SELECT COUNT(*) as c FROM reports WHERE status = 'open' AND priority = 'urgent'
-    `).get().c;
-
-    const normal_open = db.prepare(`
-      SELECT COUNT(*) as c FROM reports WHERE status = 'open' AND priority = 'normal'
-    `).get().c;
-
-    const resolved_today = db.prepare(`
-      SELECT COUNT(*) as c FROM reports WHERE status = 'resolved' AND DATE(resolved_at) = DATE('now')
-    `).get().c;
-
-    res.json({ today_total, urgent_open, normal_open, resolved_today });
+    const g = (sql) => db.prepare(sql).get().c;
+    res.json({
+      today_total:     g(`SELECT COUNT(*) as c FROM reports WHERE DATE(created_at) = DATE('now')`),
+      urgent_open:     g(`SELECT COUNT(*) as c FROM reports WHERE status='open' AND priority='urgent'`),
+      normal_open:     g(`SELECT COUNT(*) as c FROM reports WHERE status='open' AND priority='normal'`),
+      resolved_today:  g(`SELECT COUNT(*) as c FROM reports WHERE status='resolved' AND DATE(resolved_at)=DATE('now')`),
+      inspected_total: g(`SELECT COUNT(*) as c FROM reports WHERE inspected_at IS NOT NULL`),
+      closed_total:    g(`SELECT COUNT(*) as c FROM reports WHERE status='closed'`),
+    });
   } catch (err) {
     console.error(`[${new Date().toISOString()}] GET /api/stats error:`, err);
     res.status(500).json({ error: 'حدث خطأ في الخادم' });
