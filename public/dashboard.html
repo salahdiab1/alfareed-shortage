@@ -29,60 +29,52 @@
 
   <main class="dash-main">
 
-    <!-- Stats -->
-    <section class="stats-grid">
+    <!-- Stats (clickable filters) -->
+    <section class="stats-grid" id="statsGrid">
 
-      <div class="stat-card stat-today">
+      <button class="stat-card stat-today" data-filter="all">
         <div class="stat-bg-icon">📋</div>
         <div class="stat-number" id="statTotal">0</div>
-        <div class="stat-label">إجمالي اليوم</div>
-        <div class="stat-sublabel">مجموع البلاغات</div>
-      </div>
+        <div class="stat-label">الإجمالي</div>
+        <div class="stat-sublabel">جميع البلاغات</div>
+      </button>
 
-      <div class="stat-card stat-urgent">
+      <button class="stat-card stat-urgent" data-filter="urgent">
         <div class="stat-bg-icon">⚡</div>
         <div class="stat-number" id="statUrgent">0</div>
         <div class="stat-label">عاجل مفتوح</div>
         <div class="stat-sublabel">تحتاج تدخل فوري</div>
-      </div>
+      </button>
 
-      <div class="stat-card stat-normal">
+      <button class="stat-card stat-normal" data-filter="normal">
         <div class="stat-bg-icon">📦</div>
         <div class="stat-number" id="statNormal">0</div>
         <div class="stat-label">عادي مفتوح</div>
         <div class="stat-sublabel">قيد المتابعة</div>
-      </div>
+      </button>
 
-      <div class="stat-card stat-resolved">
+      <button class="stat-card stat-resolved" data-filter="resolved">
         <div class="stat-bg-icon">✅</div>
         <div class="stat-number" id="statResolved">0</div>
-        <div class="stat-label">تم الحل اليوم</div>
-        <div class="stat-sublabel">أُنجزت اليوم</div>
-      </div>
+        <div class="stat-label">تم الحل</div>
+        <div class="stat-sublabel">إجمالي المحلولة</div>
+      </button>
 
-      <div class="stat-card stat-inspected">
+      <button class="stat-card stat-inspected" data-filter="inspected">
         <div class="stat-bg-icon">🔍</div>
         <div class="stat-number" id="statInspected">0</div>
         <div class="stat-label">تم الفحص</div>
         <div class="stat-sublabel">جرى التحقق منها</div>
-      </div>
+      </button>
 
-      <div class="stat-card stat-closed">
+      <button class="stat-card stat-closed" data-filter="closed">
         <div class="stat-bg-icon">⛔</div>
         <div class="stat-number" id="statClosed">0</div>
         <div class="stat-label">مغلق</div>
         <div class="stat-sublabel">تم إغلاقها</div>
-      </div>
+      </button>
 
     </section>
-
-    <!-- Filter Tabs -->
-    <div class="tabs" role="tablist">
-      <button class="tab active" data-filter="all" role="tab" aria-selected="true">الكل</button>
-      <button class="tab" data-filter="urgent" role="tab" aria-selected="false">عاجل</button>
-      <button class="tab" data-filter="normal" role="tab" aria-selected="false">عادي</button>
-      <button class="tab" data-filter="resolved" role="tab" aria-selected="false">تم الحل</button>
-    </div>
 
     <!-- Report List -->
     <section class="report-list" id="reportList">

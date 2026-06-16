@@ -30,27 +30,26 @@ const upload = multer({
 // POST /api/reports
 router.post('/reports', upload.single('photo'), (req, res) => {
   try {
-    const { worker_name, product, quantity, priority } = req.body;
+    const { worker_name, product, quantity, notes, priority } = req.body;
 
-    if (!worker_name?.trim() || !product?.trim() || !quantity || !priority) {
+    if (!worker_name?.trim() || !product?.trim() || !priority) {
       return res.status(400).json({ error: 'جميع الحقول المطلوبة يجب تعبئتها' });
-    }
-
-    const qty = parseInt(quantity);
-    if (isNaN(qty) || qty <= 0) {
-      return res.status(400).json({ error: 'الكمية يجب أن تكون رقماً أكبر من صفر' });
     }
 
     if (!['urgent', 'normal'].includes(priority)) {
       return res.status(400).json({ error: 'قيمة الأولوية غير صحيحة' });
     }
 
+    // Support both old (quantity) and new (notes) submissions
+    const qty   = quantity ? parseInt(quantity) || 0 : 0;
+    const notesTxt = notes?.trim() || null;
+
     const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
 
     const result = db.prepare(`
-      INSERT INTO reports (worker_name, product, quantity, priority, photo_path)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(worker_name.trim(), product.trim(), qty, priority, photo_path);
+      INSERT INTO reports (worker_name, product, quantity, notes, priority, photo_path)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(worker_name.trim(), product.trim(), qty, notesTxt, priority, photo_path);
 
     res.status(201).json({ id: result.lastInsertRowid, message: 'تم إضافة البلاغ بنجاح' });
   } catch (err) {
@@ -140,10 +139,10 @@ router.get('/stats', (req, res) => {
   try {
     const g = (sql) => db.prepare(sql).get().c;
     res.json({
-      today_total:     g(`SELECT COUNT(*) as c FROM reports WHERE DATE(created_at) = DATE('now')`),
+      total:           g(`SELECT COUNT(*) as c FROM reports`),
       urgent_open:     g(`SELECT COUNT(*) as c FROM reports WHERE status='open' AND priority='urgent'`),
       normal_open:     g(`SELECT COUNT(*) as c FROM reports WHERE status='open' AND priority='normal'`),
-      resolved_today:  g(`SELECT COUNT(*) as c FROM reports WHERE status='resolved' AND DATE(resolved_at)=DATE('now')`),
+      resolved_total:  g(`SELECT COUNT(*) as c FROM reports WHERE status='resolved'`),
       inspected_total: g(`SELECT COUNT(*) as c FROM reports WHERE inspected_at IS NOT NULL`),
       closed_total:    g(`SELECT COUNT(*) as c FROM reports WHERE status='closed'`),
     });

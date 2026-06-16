@@ -67,7 +67,19 @@
   transition: transform 0.18s, box-shadow 0.18s;
 }
 
+.stat-card {
+  border: none;
+  text-align: right;
+  cursor: pointer;
+}
 .stat-card:active { transform: scale(0.97); }
+
+.stat-card.stat-active {
+  outline: 3px solid white;
+  outline-offset: 2px;
+  transform: scale(1.03);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.28);
+}
 
 /* large watermark icon */
 .stat-bg-icon {
@@ -326,6 +338,22 @@
   font-weight: 900;
   color: var(--green-dark);
   line-height: 1;
+}
+
+.card-notes-display {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notes-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .card-actions {

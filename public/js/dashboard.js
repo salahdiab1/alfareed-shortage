@@ -1,16 +1,16 @@
 'use strict';
 
 let currentReports = [];
-let currentFilter  = 'all';
+let currentFilter  = 'open';
 
-const reportList   = document.getElementById('reportList');
+const reportList    = document.getElementById('reportList');
 const statTotal     = document.getElementById('statTotal');
 const statUrgent    = document.getElementById('statUrgent');
 const statNormal    = document.getElementById('statNormal');
 const statResolved  = document.getElementById('statResolved');
 const statInspected = document.getElementById('statInspected');
 const statClosed    = document.getElementById('statClosed');
-const tabs         = document.querySelectorAll('.tab');
+const statCards     = document.querySelectorAll('.stat-card');
 const lightbox          = document.getElementById('lightbox');
 const lightboxImg       = document.getElementById('lightboxImg');
 const lightboxDownload  = document.getElementById('lightboxDownload');
@@ -54,10 +54,10 @@ async function fetchStats() {
     const res = await fetch('/api/stats');
     if (!res.ok) return;
     const d = await res.json();
-    animateCount(statTotal,     d.today_total);
+    animateCount(statTotal,     d.total);
     animateCount(statUrgent,    d.urgent_open);
     animateCount(statNormal,    d.normal_open);
-    animateCount(statResolved,  d.resolved_today);
+    animateCount(statResolved,  d.resolved_total);
     animateCount(statInspected, d.inspected_total);
     animateCount(statClosed,    d.closed_total);
   } catch (err) {
@@ -79,10 +79,19 @@ async function fetchReports() {
 
 // --- Filter ---
 function filtered() {
-  if (currentFilter === 'urgent')   return currentReports.filter(r => r.priority === 'urgent'  && r.status === 'open');
-  if (currentFilter === 'normal')   return currentReports.filter(r => r.priority === 'normal'  && r.status === 'open');
-  if (currentFilter === 'resolved') return currentReports.filter(r => r.status === 'resolved');
+  if (currentFilter === 'open')      return currentReports.filter(r => r.status === 'open');
+  if (currentFilter === 'urgent')    return currentReports.filter(r => r.priority === 'urgent' && r.status === 'open');
+  if (currentFilter === 'normal')    return currentReports.filter(r => r.priority === 'normal' && r.status === 'open');
+  if (currentFilter === 'resolved')  return currentReports.filter(r => r.status === 'resolved');
+  if (currentFilter === 'closed')    return currentReports.filter(r => r.status === 'closed');
+  if (currentFilter === 'inspected') return currentReports.filter(r => r.inspected_at);
   return currentReports;
+}
+
+function applyFilter(f) {
+  currentFilter = f;
+  statCards.forEach(c => c.classList.toggle('stat-active', c.dataset.filter === f));
+  renderList();
 }
 
 // --- Render ---
@@ -163,10 +172,12 @@ function buildCard(r) {
       ${photoHtml}
 
       <div class="card-footer">
-        <div class="card-quantity">
-          <span class="qty-label">📦 الكمية الناقصة</span>
-          <strong class="qty-value">${r.quantity}</strong>
-        </div>
+        ${r.notes
+          ? `<div class="card-notes-display"><span class="qty-label">📝 ملاحظات</span><span class="notes-text">${esc(r.notes)}</span></div>`
+          : r.quantity
+          ? `<div class="card-quantity"><span class="qty-label">📦 الكمية الناقصة</span><strong class="qty-value">${r.quantity}</strong></div>`
+          : `<div></div>`
+        }
         ${actionsHtml}
       </div>
 
@@ -255,16 +266,13 @@ async function resolveReport(id, btn) {
   }
 }
 
-// --- Filter tabs ---
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-    tab.classList.add('active');
-    tab.setAttribute('aria-selected', 'true');
-    currentFilter = tab.dataset.filter;
-    renderList();
-  });
+// --- Stat card filters ---
+statCards.forEach(card => {
+  card.addEventListener('click', () => applyFilter(card.dataset.filter));
 });
+
+// Set default active card
+document.querySelector('.stat-card[data-filter="all"]')?.classList.add('stat-active');
 
 // --- Lightbox ---
 function openLightbox(src) {

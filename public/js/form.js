@@ -10,7 +10,7 @@ const reportForm       = document.getElementById('reportForm');
 const workerSelect     = document.getElementById('workerSelect');
 const workerCustomInput= document.getElementById('workerNameCustom');
 const productNameInput = document.getElementById('productName');
-const quantityInput    = document.getElementById('quantity');
+const notesInput       = document.getElementById('notes');
 const priorityInput    = document.getElementById('priorityInput');
 const priorityBtns     = document.querySelectorAll('.priority-btn');
 const photoInput       = document.getElementById('photoInput');
@@ -90,7 +90,7 @@ removePhotoBtn.addEventListener('click', (e) => {
 
 // Clear errors on input change
 productNameInput.addEventListener('input', () => clearFieldError('productNameError', productNameInput));
-quantityInput.addEventListener('input', () => clearFieldError('quantityError', quantityInput));
+notesInput.addEventListener('input', () => clearFieldError('notesError', notesInput));
 
 // Submit
 submitBtn.addEventListener('click', async () => {
@@ -107,7 +107,7 @@ submitBtn.addEventListener('click', async () => {
   const formData = new FormData();
   formData.append('worker_name', getWorkerName());
   formData.append('product',     productNameInput.value.trim());
-  formData.append('quantity',    quantityInput.value);
+  formData.append('notes',       notesInput.value.trim());
   formData.append('priority',    priorityInput.value);
   if (compressedFile) formData.append('photo', compressedFile);
 
@@ -153,15 +153,6 @@ function validateForm() {
     clearFieldError('productNameError', productNameInput);
   }
 
-  const qty = parseInt(quantityInput.value);
-  if (!quantityInput.value || isNaN(qty) || qty <= 0) {
-    showFieldError('quantityError', 'أدخل كمية صحيحة أكبر من صفر');
-    quantityInput.classList.add('input-error');
-    valid = false;
-  } else {
-    clearFieldError('quantityError', quantityInput);
-  }
-
   if (!priorityInput.value) {
     showFieldError('priorityError', 'اختر الأولوية');
     valid = false;
@@ -196,7 +187,7 @@ function showSuccess() {
 
 function resetForm() {
   productNameInput.value = '';
-  quantityInput.value    = '';
+  notesInput.value       = '';
   priorityInput.value    = '';
   priorityBtns.forEach(b => b.classList.remove('selected-urgent', 'selected-normal'));
   compressedFile = null;
@@ -205,11 +196,11 @@ function resetForm() {
   photoPlaceholder.hidden = false;
   photoPreview.hidden = true;
 
-  ['workerNameError','productNameError','quantityError','priorityError','submitError'].forEach(id => {
+  ['workerNameError','productNameError','notesError','priorityError','submitError'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = '';
   });
-  [workerSelect, workerCustomInput, productNameInput, quantityInput].forEach(el => el.classList.remove('input-error'));
+  [workerSelect, workerCustomInput, productNameInput, notesInput].forEach(el => el.classList.remove('input-error'));
 
   setLoading(false);
   successCard.hidden = true;
