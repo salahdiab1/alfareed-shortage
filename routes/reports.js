@@ -42,7 +42,8 @@ router.post('/reports', upload.single('photo'), (req, res) => {
     }
 
     // Support both old (quantity) and new (notes) submissions
-    const qty   = quantity ? parseInt(quantity) || 0 : 0;
+    // DB has CHECK(quantity > 0), default to 1 when not submitted
+    const qty   = quantity ? parseInt(quantity) || 1 : 1;
     const notesTxt = notes?.trim() || null;
 
     const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
