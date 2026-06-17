@@ -1,7 +1,20 @@
 'use strict';
 
-const QRCode = require('qrcode');
-const path   = require('path');
+const QRCode     = require('qrcode');
+const path       = require('path');
+const { execSync } = require('child_process');
+
+function findChromium() {
+  if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
+  const candidates = ['chromium', 'chromium-browser', 'google-chrome', 'google-chrome-stable'];
+  for (const bin of candidates) {
+    try {
+      const p = execSync(`which ${bin} 2>/dev/null`).toString().trim();
+      if (p) return p;
+    } catch {}
+  }
+  return undefined;
+}
 
 const DATA_DIR   = process.env.DATA_DIR || __dirname;
 const AUTH_PATH  = path.join(DATA_DIR, '.wwebjs_auth');
@@ -24,7 +37,7 @@ function startClient() {
     client = new Client({
       authStrategy: new LocalAuth({ dataPath: AUTH_PATH }),
       puppeteer: {
-        executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
+        executablePath: findChromium(),
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         headless: true,
       },
