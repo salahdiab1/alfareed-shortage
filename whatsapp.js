@@ -1,6 +1,5 @@
 'use strict';
 
-const { Client, LocalAuth } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const path   = require('path');
 
@@ -13,38 +12,54 @@ const RECIPIENTS = [
   '972543005884@c.us',
 ];
 
-const client = new Client({
-  authStrategy: new LocalAuth({ dataPath: AUTH_PATH }),
-  puppeteer: {
-    executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    headless: true,
-  },
-});
+let client  = null;
+let ready   = false;
+let lastQR  = null;
+let initErr = null;
 
-let ready    = false;
-let lastQR   = null;
+function startClient() {
+  try {
+    const { Client, LocalAuth } = require('whatsapp-web.js');
 
-client.on('qr', qr => {
-  lastQR = qr;
-  console.log('📱 QR كود جاهز — افتح /wa-qr في المتصفح لمسحه');
-});
+    client = new Client({
+      authStrategy: new LocalAuth({ dataPath: AUTH_PATH }),
+      puppeteer: {
+        executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+        headless: true,
+      },
+    });
 
-client.on('ready', () => {
-  ready  = true;
-  lastQR = null;
-  console.log('✅ واتساب متصل وجاهز للإرسال التلقائي');
-});
+    client.on('qr', qr => {
+      lastQR = qr;
+      console.log('📱 QR كود جاهز — افتح /wa-qr في المتصفح لمسحه');
+    });
 
-client.on('auth_failure', () => console.error('❌ فشل تسجيل الدخول لواتساب'));
+    client.on('ready', () => {
+      ready  = true;
+      lastQR = null;
+      console.log('✅ واتساب متصل وجاهز للإرسال التلقائي');
+    });
 
-client.on('disconnected', reason => {
-  ready = false;
-  console.warn('⚠️  واتساب انقطع:', reason);
-  setTimeout(() => client.initialize(), 5000);
-});
+    client.on('auth_failure', () => console.error('❌ فشل تسجيل الدخول لواتساب'));
 
-client.initialize().catch(err => console.error('❌ خطأ في تهيئة واتساب:', err.message));
+    client.on('disconnected', reason => {
+      ready = false;
+      console.warn('⚠️  واتساب انقطع:', reason);
+      setTimeout(startClient, 5000);
+    });
+
+    client.initialize().catch(err => {
+      initErr = err.message;
+      console.error('❌ خطأ في تهيئة واتساب:', err.message);
+    });
+  } catch (err) {
+    initErr = err.message;
+    console.error('❌ تعذّر تحميل whatsapp-web.js:', err.message);
+  }
+}
+
+startClient();
 
 async function sendMessage(text) {
   if (!ready) {
@@ -66,5 +81,6 @@ async function getQRImage() {
 }
 
 function isReady() { return ready; }
+function getError() { return initErr; }
 
-module.exports = { sendMessage, getQRImage, isReady };
+module.exports = { sendMessage, getQRImage, isReady, getError };

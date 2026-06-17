@@ -21,7 +21,7 @@ const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const db = require('./database');
-const { getQRImage, isReady } = require('./whatsapp');
+const { getQRImage, isReady, getError } = require('./whatsapp');
 
 app.use(express.json());
 
@@ -43,13 +43,15 @@ app.get('/dashboard', (req, res) => {
 });
 
 app.get('/wa-qr', async (req, res) => {
-  if (isReady()) return res.send('<h2 style="font-family:sans-serif;color:green">✅ واتساب متصل بالفعل</h2>');
+  if (isReady()) return res.send('<h2 style="font-family:sans-serif;color:green;padding:40px">✅ واتساب متصل بالفعل</h2>');
+  const err = getError();
+  if (err) return res.send(`<h2 style="font-family:sans-serif;color:red;padding:40px">❌ خطأ: ${err}</h2>`);
   const img = await getQRImage();
-  if (!img) return res.send('<h2 style="font-family:sans-serif">⏳ QR لم يصدر بعد، انتظر ثوانٍ وأعد التحميل...</h2>');
+  if (!img) return res.send('<html><body style="font-family:sans-serif;text-align:center;padding:40px"><h2>⏳ جاري تشغيل واتساب، انتظر ثوانٍ...</h2><script>setTimeout(()=>location.reload(),5000)</script></body></html>');
   res.send(`<html><body style="text-align:center;font-family:sans-serif;padding:40px">
     <h2>امسح QR بواتساب لربط الحساب</h2>
     <img src="${img}" style="width:280px"><br>
-    <small>الصفحة تتحدث تلقائياً</small>
+    <small>الصفحة تتحدث تلقائياً كل 15 ثانية</small>
     <script>setTimeout(()=>location.reload(),15000)</script>
   </body></html>`);
 });
