@@ -42,6 +42,16 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+app.get('/wa-debug', (req, res) => {
+  const { execSync } = require('child_process');
+  let info = {};
+  try { info.which_chromium = execSync('which chromium 2>/dev/null').toString().trim(); } catch { info.which_chromium = 'not found'; }
+  try { info.which_chrome = execSync('which google-chrome 2>/dev/null').toString().trim(); } catch { info.which_chrome = 'not found'; }
+  info.CHROMIUM_PATH = process.env.CHROMIUM_PATH || '(empty)';
+  info.PATH = process.env.PATH;
+  res.json(info);
+});
+
 app.get('/wa-qr', async (req, res) => {
   if (isReady()) return res.send('<h2 style="font-family:sans-serif;color:green;padding:40px">✅ واتساب متصل بالفعل</h2>');
   const err = getError();
