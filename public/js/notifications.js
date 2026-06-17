@@ -21,15 +21,19 @@
 
 function updateBtn(btn, permission) {
   if (permission === 'granted') {
-    btn.textContent = '🔔 الإشعارات مفعّلة';
+    btn.textContent = '🔔';
+    btn.title = 'الإشعارات مفعّلة';
     btn.disabled = true;
-    btn.style.opacity = '0.7';
+    btn.style.opacity = '1';
+    btn.style.background = 'rgba(255,255,255,0.35)';
   } else if (permission === 'denied') {
-    btn.textContent = '🔕 الإشعارات محظورة';
+    btn.textContent = '🔕';
+    btn.title = 'الإشعارات محظورة — افتح إعدادات المتصفح لتفعيلها';
     btn.disabled = true;
     btn.style.opacity = '0.5';
   } else {
-    btn.textContent = '🔔 تفعيل الإشعارات';
+    btn.textContent = '🔔';
+    btn.title = 'اضغط لتفعيل الإشعارات';
     btn.disabled = false;
   }
 }
