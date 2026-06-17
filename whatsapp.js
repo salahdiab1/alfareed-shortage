@@ -37,7 +37,7 @@ function startClient() {
     client = new Client({
       authStrategy: new LocalAuth({ dataPath: AUTH_PATH }),
       puppeteer: {
-        executablePath: findChromium(),
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || findChromium(),
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
         headless: true,
       },
