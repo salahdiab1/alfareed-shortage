@@ -52,6 +52,8 @@ router.post('/reports', upload.single('photo'), (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(worker_name.trim(), product.trim(), qty, notesTxt, priority, photo_path);
 
+    res.status(201).json({ id: result.lastInsertRowid, message: 'تم إضافة البلاغ بنجاح' });
+
     const priorityLabel = priority === 'urgent' ? '🔴 عاجل' : '🟢 عادي';
     let waMsg = `📦 بلاغ نقص جديد\n`;
     waMsg += `👤 الموظف: ${worker_name.trim()}\n`;
@@ -59,8 +61,6 @@ router.post('/reports', upload.single('photo'), (req, res) => {
     if (notesTxt) waMsg += `📝 ملاحظات: ${notesTxt}\n`;
     waMsg += `⚡ الأولوية: ${priorityLabel}`;
     sendMessage(waMsg).catch(() => {});
-
-    res.status(201).json({ id: result.lastInsertRowid, message: 'تم إضافة البلاغ بنجاح' });
   } catch (err) {
     console.error(`[${new Date().toISOString()}] POST /api/reports error:`, err);
     res.status(500).json({ error: 'حدث خطأ في الخادم' });
