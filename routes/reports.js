@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const db = require('../database');
+const { sendMessage } = require('../whatsapp');
 
 const UPLOADS_DIR = path.join(process.env.DATA_DIR || path.join(__dirname, '..'), 'uploads');
 
@@ -50,6 +51,14 @@ router.post('/reports', upload.single('photo'), (req, res) => {
       INSERT INTO reports (worker_name, product, quantity, notes, priority, photo_path)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(worker_name.trim(), product.trim(), qty, notesTxt, priority, photo_path);
+
+    const priorityLabel = priority === 'urgent' ? '🔴 عاجل' : '🟢 عادي';
+    let waMsg = `📦 بلاغ نقص جديد\n`;
+    waMsg += `👤 الموظف: ${worker_name.trim()}\n`;
+    waMsg += `🛒 المنتج: ${product.trim()}\n`;
+    if (notesTxt) waMsg += `📝 ملاحظات: ${notesTxt}\n`;
+    waMsg += `⚡ الأولوية: ${priorityLabel}`;
+    sendMessage(waMsg).catch(() => {});
 
     res.status(201).json({ id: result.lastInsertRowid, message: 'تم إضافة البلاغ بنجاح' });
   } catch (err) {
