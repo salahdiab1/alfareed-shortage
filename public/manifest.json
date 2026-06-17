@@ -1,0 +1,15 @@
+{
+  "name": "AL FAREED — نظام النواقص",
+  "short_name": "الفريد",
+  "description": "نظام تسجيل نواقص المنتجات",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f4f0",
+  "theme_color": "#1B5E20",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "/assets/farid.webp", "sizes": "192x192", "type": "image/webp", "purpose": "any maskable" },
+    { "src": "/assets/farid.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any maskable" }
+  ]
+}

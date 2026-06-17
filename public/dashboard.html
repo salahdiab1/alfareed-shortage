@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/shared.css">
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
@@ -16,6 +17,7 @@
   <nav class="app-nav">
     <a href="/"          class="nav-btn inactive">📝 تسجيل نقص</a>
     <a href="/dashboard" class="nav-btn active">📊 الداشبورد</a>
+    <button id="notifBtn" class="notif-btn">🔔</button>
   </nav>
 
   <!-- Sticky Header -->
@@ -97,5 +99,6 @@
   </div>
 
   <script src="/js/dashboard.js"></script>
+  <script src="/js/notifications.js"></script>
 </body>
 </html>

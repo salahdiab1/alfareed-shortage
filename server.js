@@ -21,7 +21,6 @@ const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const db = require('./database');
-require('./whatsapp');
 
 app.use(express.json());
 
@@ -37,6 +36,7 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', require('./routes/reports'));
+app.use('/api/push', require('./routes/push').router);
 
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));

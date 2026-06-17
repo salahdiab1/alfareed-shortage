@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const db = require('../database');
-const { sendMessage } = require('../whatsapp');
+const { sendPushToAll } = require('./push');
 
 const UPLOADS_DIR = path.join(process.env.DATA_DIR || path.join(__dirname, '..'), 'uploads');
 
@@ -55,13 +55,13 @@ router.post('/reports', upload.single('photo'), (req, res) => {
 
     res.status(201).json({ id: result.lastInsertRowid, message: 'تم إضافة البلاغ بنجاح' });
 
-    const priorityLabel = priority === 'urgent' ? '🔴 عاجل' : '🟢 عادي';
-    let waMsg = `📦 بلاغ نقص جديد\n`;
-    waMsg += `👤 الموظف: ${worker_name.trim()}\n`;
-    waMsg += `🛒 المنتج: ${product.trim()}\n`;
-    if (notesTxt) waMsg += `📝 ملاحظات: ${notesTxt}\n`;
-    waMsg += `⚡ الأولوية: ${priorityLabel}`;
-    sendMessage(waMsg).catch(() => {});
+    const urgent = priority === 'urgent';
+    sendPushToAll(JSON.stringify({
+      title: `${urgent ? '🔴 عاجل' : '🟡 عادي'} — نقص جديد`,
+      body: `${worker_name.trim()} : ${product.trim()}${notesTxt ? '\n' + notesTxt : ''}`,
+      url: '/dashboard',
+      urgent
+    })).catch(() => {});
   } catch (err) {
     console.error(`[${new Date().toISOString()}] POST /api/reports error:`, err);
     res.status(500).json({ error: 'حدث خطأ في الخادم' });

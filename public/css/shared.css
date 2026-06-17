@@ -77,6 +77,24 @@ body { min-height: 100vh; }
 .nav-btn.inactive { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.92); }
 .nav-btn.inactive:hover { background: rgba(255,255,255,0.22); color: white; }
 
+.notif-btn {
+  margin-right: auto;
+  height: 36px;
+  width: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.notif-btn:hover:not(:disabled) { background: rgba(255,255,255,0.28); }
+
 /* ── Spinner ── */
 .spinner {
   display: inline-block;
