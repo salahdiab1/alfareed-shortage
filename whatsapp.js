@@ -2,7 +2,7 @@
 
 const INSTANCE_ID = process.env.GREEN_API_INSTANCE;
 const API_TOKEN   = process.env.GREEN_API_TOKEN;
-const BASE_URL    = 'https://api.green-api.com';
+const BASE_URL    = process.env.GREEN_API_URL || 'https://api.green-api.com';
 
 const RECIPIENTS = [
   '972505142161@c.us',
