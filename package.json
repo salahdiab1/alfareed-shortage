@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "PUPPETEER_EXECUTABLE_PATH=$(which chromium 2>/dev/null || which chromium-browser 2>/dev/null || echo '') node server.js",
+    "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
     "better-sqlite3": "^9.0.0",
     "express": "^4.18.0",
-    "multer": "^1.4.5-lts.1",
-    "qrcode": "^1.5.4",
-    "whatsapp-web.js": "^1.34.7"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"
